@@ -45,6 +45,12 @@ func init() {
 		webhookCmd.PersistentFlags(),
 		"token",
 	)
+	webhookCmd.PersistentFlags().StringVar(&opts.Secret, "secret", "",
+		"A secret that is used to validate the GitHub Webhook requests")
+	cobra.MarkFlagRequired(
+		webhookCmd.PersistentFlags(),
+		"secret",
+	)
 	rootCmd.AddCommand(webhookCmd)
 }
 
