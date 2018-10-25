@@ -1,0 +1,97 @@
+{
+	"comment": "",
+	"ignore": "test",
+	"package": [
+		{
+			"checksumSHA1": "HmbftipkadrLlCfzzVQ+iFHbl6g=",
+			"path": "github.com/golang/glog",
+			"revision": "23def4e6c14b4da8ac2ed8007337bc5eb5007998",
+			"revisionTime": "2016-01-25T20:49:56Z"
+		},
+		{
+			"checksumSHA1": "IQB9vU1zghMzRlaq31FQi3HHXOE=",
+			"path": "github.com/google/go-github/github",
+			"revision": "f55b50f38167644bb7e4be03d9a2bde71d435239",
+			"revisionTime": "2018-09-26T00:45:59Z"
+		},
+		{
+			"checksumSHA1": "p3IB18uJRs4dL2K5yx24MrLYE9A=",
+			"path": "github.com/google/go-querystring/query",
+			"revision": "44c6ddd0a2342c386950e880b658017258da92fc",
+			"revisionTime": "2018-09-16T13:16:37Z"
+		},
+		{
+			"checksumSHA1": "Tg05rfWxVqlqtB8G6QDHGo5wjAQ=",
+			"path": "github.com/spf13/cobra",
+			"revision": "7c4570c3ebeb8129a1f7456d0908a8b676b6f9f1",
+			"revisionTime": "2018-07-22T21:56:44Z"
+		},
+		{
+			"checksumSHA1": "k5TsfhX2vvfffYbZQ4fMKtL5+cA=",
+			"path": "github.com/spf13/pflag",
+			"revision": "583c0c0531f06d5278b7d917446061adc344b5cd",
+			"revisionTime": "2018-04-12T12:09:13Z"
+		},
+		{
+			"checksumSHA1": "GtamqiJoL7PGHsN454AoffBFMa8=",
+			"path": "golang.org/x/net/context",
+			"revision": "146acd28ed5894421fb5aac80ca93bc1b1f46f87",
+			"revisionTime": "2018-10-04T22:16:49Z"
+		},
+		{
+			"checksumSHA1": "WHc3uByvGaMcnSoI21fhzYgbOgg=",
+			"path": "golang.org/x/net/context/ctxhttp",
+			"revision": "146acd28ed5894421fb5aac80ca93bc1b1f46f87",
+			"revisionTime": "2018-10-04T22:16:49Z"
+		},
+		{
+			"checksumSHA1": "j0z/2h06wsvTkGiLaZ5XFLbMKfo=",
+			"path": "golang.org/x/oauth2",
+			"revision": "c57b0facaced709681d9f90397429b9430a74754",
+			"revisionTime": "2018-10-03T18:30:08Z"
+		},
+		{
+			"checksumSHA1": "wmIDyFF0NcgupcX+tBZbi9Z+R0A=",
+			"path": "golang.org/x/oauth2/internal",
+			"revision": "c57b0facaced709681d9f90397429b9430a74754",
+			"revisionTime": "2018-10-03T18:30:08Z"
+		},
+		{
+			"checksumSHA1": "HoCvrd3hEhsFeBOdEw7cbcfyk50=",
+			"path": "golang.org/x/time/rate",
+			"revision": "fbb02b2291d28baffd63558aa44b4b56f178d650",
+			"revisionTime": "2018-04-12T16:56:04Z"
+		},
+		{
+			"checksumSHA1": "pjnZyMVZ0SySMbYicFU9DaGYvt4=",
+			"path": "k8s.io/apimachinery/pkg/util/clock",
+			"revision": "17529ec7eadb8de8e7dc835201455f53571f655a",
+			"revisionTime": "2018-06-01T12:58:03Z"
+		},
+		{
+			"checksumSHA1": "KukExlfAW/1KcERlUZ4owXuXpXw=",
+			"path": "k8s.io/apimachinery/pkg/util/runtime",
+			"revision": "17529ec7eadb8de8e7dc835201455f53571f655a",
+			"revisionTime": "2018-06-01T12:58:03Z"
+		},
+		{
+			"checksumSHA1": "mSa7V78NKu/DjHNZCOkd62FkL2U=",
+			"path": "k8s.io/apimachinery/pkg/util/wait",
+			"revision": "17529ec7eadb8de8e7dc835201455f53571f655a",
+			"revisionTime": "2018-06-01T12:58:03Z"
+		},
+		{
+			"checksumSHA1": "Td+xk5daYSh8eGbLWRVsDeyGVbU=",
+			"path": "k8s.io/apiserver/pkg/util/logs",
+			"revision": "f4a9d31325865f18b8023622a564578f079d582b",
+			"revisionTime": "2018-03-27T06:20:11Z"
+		},
+		{
+			"checksumSHA1": "zwhwT1ly2D9O4J83gN3vN+pd4Qs=",
+			"path": "k8s.io/client-go/util/workqueue",
+			"revision": "745ca830039794f7b927b8a2c2a58dcc1e8a0a72",
+			"revisionTime": "2018-08-17T11:46:23Z"
+		}
+	],
+	"rootPath": "github.com/dastanng/gitbot"
+}
