@@ -1,0 +1,49 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: gitbot-secret
+type: Opaque
+data:
+  token: ${TOKEN}
+  secret: ${SECRET}
+
+---
+
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: gitbot
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: gitbot
+    spec:
+      containers:
+      - name: webhook
+        image: "dastanng/gitbot:0.1.0"
+        imagePullPolicy: IfNotPresent
+        args:
+        - --token=$(token)
+        - --secret=$(secret)
+        ports:
+        - containerPort: 11111
+        envFrom:
+        - secretRef:
+            name: gitbot-secret
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: gitbot
+  labels:
+    app: gitbot
+spec:
+  selector:
+    app: gitbot
+  ports:
+  - name: http
+    port: 11111
