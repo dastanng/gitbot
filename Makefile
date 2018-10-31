@@ -11,9 +11,20 @@ build: bot
 test:
 	go test -v ./...
 
-.PHONY: check-format
-check-format:
-	./tools/check_gofmt.sh
+.PHONY: gofmt-check
+gofmt-check:
+	./tools/gofmt_check.sh
+
+.PHONY: govet-check
+govet-check:
+	./tools/govet_check.sh
+
+.PHONY: golint-check
+golint-check:
+	go list ./... | grep -v "/test/" | xargs -L1 golint -set_exit_status
+
+.PHONY: all-check
+all-check: gofmt-check golint-check govet-check
 
 .PHONY: image
 image:

@@ -43,6 +43,17 @@ func (c *command) info() string {
 	)
 }
 
+// argsUsers parses user list from command args
+func (c *command) argsUsers() []string {
+	users := []string{}
+	for _, usr := range c.args {
+		if len(usr) > 0 {
+			users = append(users, strings.TrimPrefix(usr, "@"))
+		}
+	}
+	return users
+}
+
 // cmdClose handles command /close
 func (b *Bot) cmdClose(c *command) bool {
 	// check command syntax
@@ -77,10 +88,13 @@ func (b *Bot) cmdClose(c *command) bool {
 	return true
 }
 
-// cmdAssign handles command /[un]assign [[@]...]
-func (b *Bot) cmdAssign(c *command) bool {
-	// check command syntax
-	if len(c.args) > 1 {
+// cmdAssign handles command /assign [[@]...]
+func (b *Bot) cmdAddAssignees(c *command) bool {
+	var err error
+	ctx := context.Background()
+
+	// make sure args has at least one assignee
+	if len(c.argsUsers()) < 1 {
 		glog.Info(c.invalid())
 		return true
 	}
@@ -91,25 +105,125 @@ func (b *Bot) cmdAssign(c *command) bool {
 		return true
 	}
 
-	ctx := context.Background()
-	assignee := c.user
-	if len(c.args) == 1 {
-		assignee = strings.TrimPrefix(c.args[0], "@")
-	}
-
-	// TODO(dunjut) check membership
-
-	// assign/unassign issue to/from assignee as requested.
-	var err error
-	if c.cmd == "/assign" {
-		_, _, err = b.git.Issues.AddAssignees(ctx, c.owner, c.repo, c.number, []string{assignee})
-	} else { // /unassign
-		_, _, err = b.git.Issues.RemoveAssignees(ctx, c.owner, c.repo, c.number, []string{assignee})
-	}
+	isMemeber, _, err := b.git.Organizations.IsMember(ctx, c.owner, c.user)
 	if err != nil {
 		glog.Errorf("%s err: %v", c.failed(), err)
 		return false
 	}
+
+	if !isMemeber {
+		glog.Errorf("%s is not a member of %s", c.user, c.owner)
+		return true
+	}
+
+	_, _, err = b.git.Issues.AddAssignees(ctx, c.owner, c.repo, c.number, c.argsUsers())
+	if err != nil {
+		glog.Errorf("%s err: %v", c.failed(), err)
+		return false
+	}
+	glog.Info(c.succeed())
+	return true
+}
+
+// cmdAssign handles command /unassign [[@]...]
+func (b *Bot) cmdRemoveAssignees(c *command) bool {
+	var err error
+	ctx := context.Background()
+
+	// make sure args has at least one assignee
+	if len(c.argsUsers()) < 1 {
+		glog.Info(c.invalid())
+		return true
+	}
+
+	// ignore assign command when repo owner is not an organization
+	if c.ownerType != "Organization" {
+		glog.Infof("repo owner is not an organization, ignore.")
+		return true
+	}
+
+	isMemeber, _, err := b.git.Organizations.IsMember(ctx, c.owner, c.user)
+	if err != nil {
+		glog.Errorf("%s err: %v", c.failed(), err)
+		return false
+	}
+
+	if !isMemeber {
+		glog.Errorf("%s is not a member of %s", c.user, c.owner)
+		return true
+	}
+
+	_, _, err = b.git.Issues.RemoveAssignees(ctx, c.owner, c.repo, c.number, c.argsUsers())
+	if err != nil {
+		glog.Errorf("%s err: %v", c.failed(), err)
+		return false
+	}
+	glog.Info(c.succeed())
+	return true
+}
+
+// cmdRequestReviewers handles command /cc [[@]...]
+func (b *Bot) cmdRequestReviewers(c *command) bool {
+	var err error
+	ctx := context.Background()
+
+	// make sure args has at least one reviewer
+	if len(c.argsUsers()) < 1 {
+		glog.Info(c.invalid())
+		return true
+	}
+
+	isMemeber, _, err := b.git.Organizations.IsMember(ctx, c.owner, c.user)
+	if err != nil {
+		glog.Errorf("%s err: %v", c.failed(), err)
+		return false
+	}
+
+	if !isMemeber {
+		glog.Errorf("%s is not a member of %s", c.user, c.owner)
+		return true
+	}
+
+	reviewersRequest := github.ReviewersRequest{Reviewers: c.argsUsers()}
+	_, _, err = b.git.PullRequests.RequestReviewers(ctx, c.owner, c.repo, c.number, reviewersRequest)
+	if err != nil {
+		glog.Errorf("%s err: %v", c.failed(), err)
+		return false
+	}
+
+	glog.Info(c.succeed())
+	return true
+}
+
+// cmdRequestReviewers handles command /uncc [[@]...]
+func (b *Bot) cmdRemoveReviewers(c *command) bool {
+	var err error
+	ctx := context.Background()
+
+	// make sure args has at least one reviewer
+	if len(c.argsUsers()) < 1 {
+		glog.Info(c.invalid())
+		return true
+	}
+
+	isMemeber, _, err := b.git.Organizations.IsMember(ctx, c.owner, c.user)
+	if err != nil {
+		glog.Errorf("%s err: %v", c.failed(), err)
+		return false
+	}
+
+	if !isMemeber {
+		glog.Errorf("%s is not a member of %s", c.user, c.owner)
+		return true
+	}
+
+	reviewersRequest := github.ReviewersRequest{Reviewers: c.argsUsers()}
+	_, err = b.git.PullRequests.RemoveReviewers(ctx, c.owner, c.repo, c.number, reviewersRequest)
+	if err != nil {
+		glog.Errorf("%s err: %v", c.failed(), err)
+		return false
+	}
+
 	glog.Info(c.succeed())
 	return true
 }
