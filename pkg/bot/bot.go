@@ -12,6 +12,7 @@ import (
 	"k8s.io/client-go/util/workqueue"
 )
 
+// Bot struct
 type Bot struct {
 	secret string
 	git    *github.Client
@@ -19,11 +20,13 @@ type Bot struct {
 	cmds   map[string]func(*command) bool
 }
 
+// InitOptions struct
 type InitOptions struct {
 	Token  string
 	Secret string
 }
 
+// Initialize bot
 func (b *Bot) Initialize(opts InitOptions) {
 	b.secret = opts.Secret
 
@@ -41,6 +44,8 @@ func (b *Bot) Initialize(opts InitOptions) {
 		"/close":    b.cmdClose,
 		"/assign":   b.cmdAssign,
 		"/unassign": b.cmdAssign,
+		"/cc":       b.cmdCc,
+		"/uncc":     b.cmdCc,
 	}
 
 	// register webhook handlers

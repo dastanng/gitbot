@@ -43,6 +43,21 @@ func (c *command) info() string {
 	)
 }
 
+// argsToUsers parses user list from command args
+// if empty args, return c.user
+func (c *command) argsToUsers() []string {
+	var users []string
+	for _, arg := range c.args {
+		if u := strings.TrimPrefix(arg, "@"); len(u) > 0 {
+			users = append(users, u)
+		}
+	}
+	if len(users) == 0 {
+		users = append(users, c.user)
+	}
+	return users
+}
+
 // cmdClose handles command /close
 func (b *Bot) cmdClose(c *command) bool {
 	// check command syntax
@@ -112,4 +127,69 @@ func (b *Bot) cmdAssign(c *command) bool {
 	}
 	glog.Info(c.succeed())
 	return true
+}
+
+// cmdCc handles command /[un]cc [[@]...]
+func (b *Bot) cmdCc(c *command) bool {
+	var err error
+	ctx := context.Background()
+
+	var validUsers []string
+	for _, usr := range c.argsToUsers() {
+		// author is not allowed to be a reviewer
+		if usr == c.author {
+			continue
+		}
+		// validates if user is a 'member' or 'collaborator' of owner/repo
+		isMember, err := b.isMember(c.owner, c.repo, usr)
+		if err != nil {
+			glog.Errorf("%s err: %v", c.failed(), err)
+			return false
+		}
+		if isMember {
+			validUsers = append(validUsers, usr)
+		}
+	}
+
+	if len(validUsers) == 0 {
+		return true
+	}
+
+	reviewersRequest := github.ReviewersRequest{Reviewers: validUsers}
+	if c.cmd == "/cc" {
+		_, _, err = b.git.PullRequests.RequestReviewers(ctx, c.owner, c.repo, c.number, reviewersRequest)
+	} else { // /uncc
+		_, err = b.git.PullRequests.RemoveReviewers(ctx, c.owner, c.repo, c.number, reviewersRequest)
+	}
+
+	if err != nil {
+		glog.Errorf("%s err: %v", c.failed(), err)
+		return false
+	}
+
+	glog.Info(c.succeed())
+	return true
+}
+
+// isMember validates if user is a 'member' or 'collaborator' of owner/repo
+func (b *Bot) isMember(owner, repo, user string) (bool, error) {
+	ctx := context.Background()
+
+	// make sure user is a member of an organization
+	isMember, _, err := b.git.Organizations.IsMember(ctx, owner, user)
+	if err != nil {
+		return false, err
+	}
+
+	if !isMember {
+		// make sure user is a collaborator of a repo
+		isCollab, _, err := b.git.Repositories.IsCollaborator(ctx, owner, repo, user)
+		if err != nil {
+			return false, err
+		}
+		if !isCollab {
+			return false, nil
+		}
+	}
+	return true, nil
 }
