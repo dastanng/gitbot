@@ -226,6 +226,8 @@ func (b *Bot) cmdHold(c *command) bool {
 		glog.Errorf("%s err: %v", c.failed(), err)
 		return false
 	}
+
+	glog.Info(c.succeed())
 	return true
 }
 
@@ -259,5 +261,7 @@ func (b *Bot) cmdWip(c *command) bool {
 		glog.Errorf("%s err: %v", c.failed(), err)
 		return false
 	}
+
+	glog.Info(c.succeed())
 	return true
 }
