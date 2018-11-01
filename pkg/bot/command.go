@@ -7,6 +7,8 @@ import (
 
 	"github.com/golang/glog"
 	"github.com/google/go-github/github"
+
+	"github.com/dastanng/gitbot/pkg/bot/labels"
 )
 
 type command struct {
@@ -192,4 +194,37 @@ func (b *Bot) isMember(owner, repo, user string) (bool, error) {
 		}
 	}
 	return true, nil
+}
+
+// cmdHold handles command /hold [cancel]
+func (b *Bot) cmdHold(c *command) bool {
+	var err error
+	ctx := context.Background()
+
+	// check command syntax
+	if len(c.args) > 1 {
+		glog.Info(c.invalid())
+		return true
+	}
+
+	var isCancel bool
+	if len(c.args) == 1 {
+		if c.args[0] != "cancel" {
+			glog.Info(c.invalid())
+			return true
+		}
+		isCancel = true
+	}
+
+	if !isCancel { // /hold
+		_, _, err = b.git.Issues.AddLabelsToIssue(ctx, c.owner, c.repo, c.number, []string{labels.Hold})
+	} else { // /hold cancel
+		_, err = b.git.Issues.RemoveLabelForIssue(ctx, c.owner, c.repo, c.number, labels.Hold)
+	}
+
+	if err != nil {
+		glog.Errorf("%s err: %v", c.failed(), err)
+		return false
+	}
+	return true
 }
