@@ -41,13 +41,17 @@ func (b *Bot) Initialize(opts InitOptions) {
 
 	// initialize command handlers
 	b.cmds = map[string]func(*command) bool{
-		"/close":    b.cmdClose,
-		"/assign":   b.cmdAssign,
-		"/unassign": b.cmdAssign,
-		"/cc":       b.cmdCc,
-		"/uncc":     b.cmdCc,
-		"/hold":     b.cmdHold,
-		"/wip":      b.cmdWip,
+		"/close":       b.cmdClose,
+		"/assign":      b.cmdAssign,
+		"/unassign":    b.cmdAssign,
+		"/cc":          b.cmdCc,
+		"/uncc":        b.cmdCc,
+		"/hold":        b.cmdHold,
+		"/wip":         b.cmdWip,
+		"/kind":        b.cmdLabel,
+		"/remove-kind": b.cmdLabel,
+		"/area":        b.cmdLabel,
+		"/remove-area": b.cmdLabel,
 	}
 
 	// register webhook handlers

@@ -265,3 +265,75 @@ func (b *Bot) cmdWip(c *command) bool {
 	glog.Info(c.succeed())
 	return true
 }
+
+// cmdLabel handles command /[remove-](kind|area)
+func (b *Bot) cmdLabel(c *command) bool {
+	var err error
+	ctx := context.Background()
+
+	// check command syntax
+	if len(c.args) != 1 {
+		glog.Info(c.invalid())
+		return true
+	}
+
+	if len(c.args[0]) == 0 {
+		glog.Info(c.invalid())
+		return true
+	}
+
+	// user should add / remove label from available repo labels
+	recognizedLabels, err := b.getRepoLabels(c.owner, c.repo)
+	if err != nil {
+		glog.Errorf("%s err: %v", c.failed(), err)
+		return false
+	}
+
+	// remove command type prefix '/' and 'remove-'
+	cmdSuffix := strings.TrimPrefix(c.cmd[1:], "remove-")
+
+	// do not add new label from cmd args
+	cmdLabel := strings.ToLower(fmt.Sprintf("%s/%s", cmdSuffix, c.args[0]))
+	if _, ok := recognizedLabels[cmdLabel]; !ok {
+		return true
+	}
+
+	isRemove := false
+	if len(cmdSuffix) != len(strings.TrimPrefix(c.cmd, "/")) {
+		isRemove = true
+	}
+
+	if isRemove {
+		_, err = b.git.Issues.RemoveLabelForIssue(ctx, c.owner, c.repo, c.number, cmdLabel)
+	} else {
+		_, _, err = b.git.Issues.AddLabelsToIssue(ctx, c.owner, c.repo, c.number, []string{cmdLabel})
+	}
+
+	if err != nil {
+		glog.Errorf("%s err: %v", c.failed(), err)
+		return false
+	}
+
+	glog.Info(c.succeed())
+	return true
+}
+
+// getRepoLabels returns labels from repo
+func (b *Bot) getRepoLabels(owner, repo string) (map[string]*github.Label, error) {
+	ctx := context.Background()
+
+	lables := make(map[string]*github.Label)
+	opt := &github.ListOptions{Page: 1, PerPage: 100}
+	for opt.Page > 0 {
+		list, resp, err := b.git.Issues.ListLabels(ctx, owner, repo, opt)
+		if err != nil {
+			return nil, err
+		}
+
+		for _, l := range list {
+			lables[strings.ToLower(*l.Name)] = l
+		}
+		opt.Page = resp.NextPage
+	}
+	return lables, nil
+}
