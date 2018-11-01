@@ -228,3 +228,36 @@ func (b *Bot) cmdHold(c *command) bool {
 	}
 	return true
 }
+
+// cmdWip handles command /wip [cancel]
+func (b *Bot) cmdWip(c *command) bool {
+	var err error
+	ctx := context.Background()
+
+	// check command syntax
+	if len(c.args) > 1 {
+		glog.Info(c.invalid())
+		return true
+	}
+
+	var isCancel bool
+	if len(c.args) == 1 {
+		if c.args[0] != "cancel" {
+			glog.Info(c.invalid())
+			return true
+		}
+		isCancel = true
+	}
+
+	if !isCancel { // /wip
+		_, _, err = b.git.Issues.AddLabelsToIssue(ctx, c.owner, c.repo, c.number, []string{labels.WorkInProgress})
+	} else { // /wip cancel
+		_, err = b.git.Issues.RemoveLabelForIssue(ctx, c.owner, c.repo, c.number, labels.WorkInProgress)
+	}
+
+	if err != nil {
+		glog.Errorf("%s err: %v", c.failed(), err)
+		return false
+	}
+	return true
+}

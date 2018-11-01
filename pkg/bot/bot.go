@@ -47,6 +47,7 @@ func (b *Bot) Initialize(opts InitOptions) {
 		"/cc":       b.cmdCc,
 		"/uncc":     b.cmdCc,
 		"/hold":     b.cmdHold,
+		"/wip":      b.cmdWip,
 	}
 
 	// register webhook handlers
