@@ -3,8 +3,8 @@
 rootdir=$(cd $(dirname $0)/..; pwd)
 tmpfile=$(mktemp)
 
-cd $rootdir
-go fmt ./... >> $tmpfile
+gofmt -l $rootdir/cmd >> $tmpfile
+gofmt -l $rootdir/pkg >> $tmpfile
 
 size=$(du $tmpfile | awk '{print $1}')
 if [[ $size != "0" ]]; then
