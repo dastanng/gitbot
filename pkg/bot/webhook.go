@@ -113,6 +113,29 @@ func (b *Bot) serve(w http.ResponseWriter, r *http.Request) {
 			// add command to working queue
 			b.queue.Add(c)
 		}
+	case *github.PullRequestReviewEvent:
+		if *e.Action != "submitted" {
+			return
+		}
+		var (
+			owner  = *e.Repo.Owner.Login
+			repo   = *e.Repo.Name
+			number = *e.PullRequest.Number
+			author = *e.PullRequest.User.Login
+			user   = *e.Review.User.Login
+			cmds   = parseCommentBody(*e.Review.Body)
+		)
+		for _, c := range cmds {
+			c.owner = owner
+			c.ownerType = *e.Repo.Owner.Type
+			c.repo = repo
+			c.number = number
+			c.author = author
+			c.user = user
+			c.event = e
+			// add command to working queue
+			b.queue.Add(c)
+		}
 	default:
 	}
 

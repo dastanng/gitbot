@@ -337,3 +337,50 @@ func (b *Bot) getRepoLabels(owner, repo string) (map[string]*github.Label, error
 	}
 	return lables, nil
 }
+
+// cmdLgtm handles command /lgtm [cancel]
+func (b *Bot) cmdLgtm(c *command) bool {
+	var err error
+	ctx := context.Background()
+
+	// check command syntax
+	if len(c.args) > 1 {
+		glog.Info(c.invalid())
+		return true
+	}
+
+	// validates if user is a 'member' or 'collaborator' of owner/repo
+	isMember, err := b.isMember(c.owner, c.repo, c.user)
+	if err != nil {
+		glog.Errorf("%s err: %v", c.failed(), err)
+		return false
+	}
+
+	if !isMember {
+		glog.Infof("user %s is not a member or collaborator of %s/%s, ignore.", c.user, c.owner, c.repo)
+		return true
+	}
+
+	var isCancel bool
+	if len(c.args) == 1 {
+		if c.args[0] != "cancel" {
+			glog.Info(c.invalid())
+			return true
+		}
+		isCancel = true
+	}
+
+	if !isCancel { // /lgtm
+		_, _, err = b.git.Issues.AddLabelsToIssue(ctx, c.owner, c.repo, c.number, []string{labels.LGTM})
+	} else { // /lgtm cancel
+		_, err = b.git.Issues.RemoveLabelForIssue(ctx, c.owner, c.repo, c.number, labels.LGTM)
+	}
+
+	if err != nil {
+		glog.Errorf("%s err: %v", c.failed(), err)
+		return false
+	}
+
+	glog.Info(c.succeed())
+	return true
+}
