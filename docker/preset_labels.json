@@ -1,0 +1,47 @@
+[
+    {
+        "name": "lgtm",
+        "description": "Indicates that a PR is ready to be merged.",
+        "color": "15dd18"
+    },
+    {
+        "name": "approved",
+        "description": "Indicates a PR has been approved by an approver from all required OWNERS files.",
+        "color": "15dd18"
+    },
+    {
+        "name": "do-not-merge/hold",
+        "description": "Indicates that a PR should not merge because someone has issued a /hold command.",
+        "color": "d93f0b"
+    },
+    {
+        "name": "do-not-merge/work-in-progress",
+        "description": "Indicates that a PR should not merge because it is a work in progress.",
+        "color": "d93f0b"
+    },
+    {
+        "name": "kind/api-change",
+        "description": "Categorizes issue or PR as related to adding, removing, or otherwise changing an API",
+        "color": "ee0701"
+    },
+    {
+        "name": "kind/bug",
+        "description": "Categorizes issue or PR as related to a bug.",
+        "color": "ee0701"
+    },
+    {
+        "name": "kind/cleanup",
+        "description": "Categorizes issue or PR as related to cleaning up code, process, or technical debt.",
+        "color": "c7def8"
+    },
+    {
+        "name": "kind/documentation",
+        "description": "Categorizes issue or PR as related to documentation.",
+        "color": "c7def8"
+    },
+    {
+        "name": "kind/feature",
+        "description": "Categorizes issue or PR as related to a new feature.",
+        "color": "c7def8"
+    }
+]

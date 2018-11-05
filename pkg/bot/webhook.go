@@ -27,6 +27,30 @@ func (b *Bot) handleWebhook(w http.ResponseWriter, r *http.Request) {
 	b.serve(w, r)
 }
 
+// handleAddPresetLabels adds preset labels to owner's repo
+func (b *Bot) handleAddPresetLabels(w http.ResponseWriter, r *http.Request) {
+	if r.Method == http.MethodPost {
+		owner := r.URL.Query().Get("owner")
+		if len(owner) < 1 {
+			http.Error(w, "Url Param 'owner' is missing", http.StatusBadRequest)
+			return
+		}
+		repo := r.URL.Query().Get("repo")
+		if len(repo) < 1 {
+			http.Error(w, "Url Param 'repo' is missing", http.StatusBadRequest)
+			return
+		}
+		if err := b.addPresetLabels(owner, repo); err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+		return
+	}
+
+	http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
+	return
+}
+
 // serve validates and dispatches webhook events to corresponding plugins.
 func (b *Bot) serve(w http.ResponseWriter, r *http.Request) {
 	payload, err := github.ValidatePayload(r, []byte(b.secret))

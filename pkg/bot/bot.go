@@ -84,6 +84,7 @@ func (b *Bot) Run(stopCh <-chan struct{}) {
 
 func (b *Bot) registerHandlers() {
 	http.HandleFunc("/webhook", b.handleWebhook)
+	http.HandleFunc("/api/labels", b.handleAddPresetLabels)
 }
 
 func (b *Bot) worker() {
