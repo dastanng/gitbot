@@ -52,6 +52,7 @@ func (b *Bot) Initialize(opts InitOptions) {
 		"/remove-kind": b.cmdLabel,
 		"/area":        b.cmdLabel,
 		"/remove-area": b.cmdLabel,
+		"/lgtm":        b.cmdLgtm,
 	}
 
 	// register webhook handlers
