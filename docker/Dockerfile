@@ -9,6 +9,9 @@ RUN apt-get clean && apt-get update && apt-get install -y \
 # 修改时区
 RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 
-ADD bot /usr/local/bin
+WORKDIR /gitbot
 
-ENTRYPOINT ["/usr/local/bin/bot", "webhook"]
+COPY bot /gitbot
+COPY preset_labels.json /gitbot
+
+ENTRYPOINT ["/gitbot/bot", "webhook"]
