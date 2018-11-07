@@ -52,6 +52,8 @@ func (b *Bot) Initialize(opts InitOptions) {
 		"/remove-kind": b.cmdLabel,
 		"/area":        b.cmdLabel,
 		"/remove-area": b.cmdLabel,
+		"/task":        b.cmdLabel,
+		"/remove-task": b.cmdLabel,
 		"/lgtm":        b.cmdLgtm,
 	}
 
