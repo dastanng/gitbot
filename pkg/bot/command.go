@@ -266,7 +266,7 @@ func (b *Bot) cmdWip(c *command) bool {
 	return true
 }
 
-// cmdLabel handles command /[remove-](kind|area)
+// cmdLabel handles command /[remove-](kind|area|task)
 func (b *Bot) cmdLabel(c *command) bool {
 	var err error
 	ctx := context.Background()
