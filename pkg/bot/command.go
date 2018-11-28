@@ -96,9 +96,23 @@ func (b *Bot) cmdClose(c *command) bool {
 
 // cmdAssign handles command /[un]assign [[@]...]
 func (b *Bot) cmdAssign(c *command) bool {
-	// check command syntax
-	if len(c.args) > 1 {
-		glog.Info(c.invalid())
+	var err error
+	ctx := context.Background()
+
+	var validUsers []string
+	for _, usr := range c.argsToUsers() {
+		// validates if user is a 'member' or 'collaborator' of owner/repo
+		isMember, err := b.isMember(c.owner, c.repo, usr)
+		if err != nil {
+			glog.Errorf("%s err: %v", c.failed(), err)
+			return false
+		}
+		if isMember {
+			validUsers = append(validUsers, usr)
+		}
+	}
+
+	if len(validUsers) == 0 {
 		return true
 	}
 
@@ -108,25 +122,17 @@ func (b *Bot) cmdAssign(c *command) bool {
 		return true
 	}
 
-	ctx := context.Background()
-	assignee := c.user
-	if len(c.args) == 1 {
-		assignee = strings.TrimPrefix(c.args[0], "@")
-	}
-
-	// TODO(dunjut) check membership
-
 	// assign/unassign issue to/from assignee as requested.
-	var err error
 	if c.cmd == "/assign" {
-		_, _, err = b.git.Issues.AddAssignees(ctx, c.owner, c.repo, c.number, []string{assignee})
+		_, _, err = b.git.Issues.AddAssignees(ctx, c.owner, c.repo, c.number, validUsers)
 	} else { // /unassign
-		_, _, err = b.git.Issues.RemoveAssignees(ctx, c.owner, c.repo, c.number, []string{assignee})
+		_, _, err = b.git.Issues.RemoveAssignees(ctx, c.owner, c.repo, c.number, validUsers)
 	}
 	if err != nil {
 		glog.Errorf("%s err: %v", c.failed(), err)
 		return false
 	}
+
 	glog.Info(c.succeed())
 	return true
 }
